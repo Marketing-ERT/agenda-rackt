@@ -186,7 +186,7 @@ function pintar() {
   const conf = delMes.filter(([e]) => e.estado === "Confirmado").length;
   const alta = delMes.filter(([e]) => e.prioridad === "Alta").length;
   document.getElementById("resumen").innerHTML =
-    `<span><strong>${delMes.length}</strong> eventos</span><span><strong>${conf}</strong> confirmados</span><span><strong>${delMes.length - conf}</strong> por decidir</span><span><strong>${alta}</strong> de prioridad alta</span>`;
+    `<span><strong>${delMes.length}</strong> eventos</span><span><strong>${conf}</strong> confirmados</span><span><strong>${delMes.filter(([e]) => e.estado === "Por confirmar").length}</strong> por decidir</span><span><strong>${alta}</strong> de prioridad alta</span>`;
 }
 
 function fechaLarga(e) {
