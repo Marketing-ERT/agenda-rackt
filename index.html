@@ -1,0 +1,223 @@
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon.ico">
+<meta property="og:title" content="Agenda de afiliaciones · RACK-T">
+<meta property="og:description" content="Eventos de cámaras y afiliaciones de Grupo ERT, mes por mes.">
+<meta property="og:image" content="https://sanoapro.github.io/rackt-piezas/una-hoja/og.jpg">
+<title>Agenda de afiliaciones RACK-T</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: banda grafito con logo y mes · cuadrícula Lun–Dom del mes · panel de detalle al elegir un evento · en celular, agenda en lista */
+:root {
+  --rojo: #ab0505; --gris: #dfdfdf; --grafito: #323131; --marino: #002455; --naranja: #f8450d;
+  --bg: #ffffff; --surface: #f4f4f4; --line: #dfdfdf; --text: #323131; --muted: #4a4848;
+  --band: #323131; --on-band: #dfdfdf; --chip: #ffffff;
+  --alta: #ab0505; --media: #f8450d; --baja: #8a8a8a;
+  --ok-bg: #e3ecf7; --ok-fg: #002455; --pend-bg: #f1f1f1; --pend-fg: #4a4848;
+  --display: "League Gothic", "Oswald", "Arial Narrow", sans-serif;
+  --body: "Bahnschrift", "Barlow", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #242323; --surface: #2c2b2b; --line: #3f3d3d; --text: #dfdfdf; --muted: #bdbdbd;
+  --band: #1b1a1a; --on-band: #dfdfdf; --chip: #323131; --baja: #9a9a9a;
+  --ok-bg: #1d2f4a; --ok-fg: #c9dbf5; --pend-bg: #3a3838; --pend-fg: #d0d0d0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #242323; --surface: #2c2b2b; --line: #3f3d3d; --text: #dfdfdf; --muted: #bdbdbd;
+  --band: #1b1a1a; --on-band: #dfdfdf; --chip: #323131; --baja: #9a9a9a;
+  --ok-bg: #1d2f4a; --ok-fg: #c9dbf5; --pend-bg: #3a3838; --pend-fg: #d0d0d0; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 16px/1.5 var(--body) }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+header { background: var(--band); color: var(--on-band) }
+header .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; padding-block: 22px }
+.logo { color: var(--gris); display: block; height: 44px }
+.logo svg { height: 44px; width: auto; display: block }
+.titulo { flex: 1 1 260px; min-width: 0 }
+.titulo small { display: block; font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; opacity: .8 }
+.titulo h1 { margin: 0; font: 400 2.1rem/1 var(--display); letter-spacing: .04em; text-transform: uppercase; text-wrap: balance }
+.barras { height: 6px; display: grid; grid-template-columns: 46fr 4fr 22fr 4fr 24fr }
+.barras i:nth-child(1) { background: var(--rojo) } .barras i:nth-child(3) { background: var(--grafito) } .barras i:nth-child(5) { background: var(--gris) }
+
+.mesbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-block: 22px 14px }
+.mes { display: flex; align-items: center; gap: 10px }
+.mes h2 { margin: 0; min-width: 9ch; text-align: center; font: 400 2.6rem/1 var(--display); letter-spacing: .05em; text-transform: uppercase }
+.mes button { width: 40px; height: 40px; border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 2px; cursor: pointer; font-size: 1.1rem }
+.mes button:hover { border-color: var(--rojo); color: var(--rojo) }
+button:focus-visible, .ev:focus-visible { outline: 3px solid var(--marino); outline-offset: 2px }
+.leyenda { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .85rem; color: var(--muted) }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px }
+.leyenda b { width: 14px; height: 4px; border-radius: 2px; display: inline-block }
+.resumen { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: .9rem; color: var(--muted); padding-bottom: 14px }
+.resumen strong { color: var(--text); font-variant-numeric: tabular-nums }
+
+.grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line) }
+.dow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface) }
+.dia { min-height: 118px; padding: 6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; min-width: 0 }
+.dia.fuera { background: var(--surface) }
+.dia.fuera .num { opacity: .35 }
+.num { font: 400 1.3rem/1 var(--display); letter-spacing: .03em }
+.dia.hoy .num { background: var(--rojo); color: #fff; padding: 3px 7px 1px; align-self: flex-start; border-radius: 2px }
+.ev { all: unset; cursor: pointer; display: block; background: var(--chip); border: 1px solid var(--line); border-left: 4px solid var(--baja); padding: 3px 6px; font-size: .78rem; line-height: 1.25; border-radius: 2px; min-width: 0 }
+.ev:hover { border-color: var(--muted) }
+.ev .n { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.ev .a { display: block; color: var(--muted); font-size: .72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.ev.Alta { border-left-color: var(--alta) } .ev.Media { border-left-color: var(--media) } .ev.Baja { border-left-color: var(--baja) }
+.ev.conf { background: var(--ok-bg) }
+.ev.conf .n::before { content: "✓ "; color: var(--ok-fg) }
+
+.lista { display: none; flex-direction: column; gap: 10px }
+.vacio { padding: 28px; text-align: center; color: var(--muted); border: 1px dashed var(--line); grid-column: 1 / -1 }
+
+.detalle { position: fixed; inset: 0; background: rgba(20,20,20,.55); display: flex; justify-content: flex-end; z-index: 20 }
+.detalle[hidden] { display: none !important }
+.panel { background: var(--bg); width: min(480px, 100%); height: 100%; overflow-y: auto; padding: calc(24px + env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) 32px 24px; display: flex; flex-direction: column; gap: 16px; border-left: 6px solid var(--rojo) }
+.panel .cerrar { align-self: flex-end; border: 1px solid var(--line); background: var(--bg); color: var(--text); padding: 6px 12px; cursor: pointer; border-radius: 2px; font: inherit }
+.panel .af { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted) }
+.panel h3 { margin: 0; font: 400 2rem/1.05 var(--display); letter-spacing: .03em; text-transform: uppercase; text-wrap: balance }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { font-size: .78rem; padding: 3px 8px; border-radius: 2px; background: var(--pend-bg); color: var(--pend-fg) }
+.chip.conf { background: var(--ok-bg); color: var(--ok-fg) }
+.chip.p-Alta { background: var(--rojo); color: #fff }
+dl { margin: 0; display: grid; grid-template-columns: 7.5em 1fr; gap: 8px 12px; font-size: .95rem }
+dt { color: var(--muted); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; padding-top: 3px }
+dd { margin: 0; white-space: pre-line; min-width: 0; overflow-wrap: anywhere }
+.liga { margin: 0 0 14px } .liga a { color: var(--rojo); font-weight: 600 }
+.tema { white-space: pre-line; font-size: .95rem; border-top: 1px solid var(--line); padding-top: 14px }
+footer { color: var(--muted); font-size: .85rem; padding-block: 26px 40px }
+
+@media (max-width: 760px) {
+  .grid { display: none }
+  .lista { display: flex }
+  .mes h2 { font-size: 2.1rem }
+  .item { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: start; border-bottom: 1px solid var(--line); padding-bottom: 10px }
+  .item .fecha { font: 400 1.9rem/1 var(--display); text-align: center; border: 1px solid var(--line); padding: 6px 0 4px }
+  .item .fecha small { display: block; font: 600 .62rem/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+  .item .ev { white-space: normal } .item .ev .n, .item .ev .a { white-space: normal }
+}
+@media (prefers-reduced-motion: no-preference) { .ev { transition: border-color .15s } }
+</style>
+
+<header>
+  <div class="wrap">
+    <span class="logo" aria-label="RACK-T"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 369.87 118.36" role="img" aria-label="RACK-T Thinking"><g fill="currentColor"><path fill-rule="nonzero" d="M140.59 8.54C140.50 8.85 140.41 9.15 140.32 9.46C139.61 11.82 137.53 13.38 135.06 13.39C130.96 13.40 126.85 13.39 122.75 13.39C84.03 13.39 45.30 13.39 6.57 13.39C4.29 13.39 2.54 12.42 1.51 10.38C0.52 8.43 0.70 6.50 1.96 4.72C2.83 3.50 4.02 2.76 5.52 2.54C5.70 2.51 5.87 2.44 6.05 2.38L135.41 2.38C135.58 2.44 135.76 2.51 135.93 2.54C138.12 2.88 139.88 4.50 140.40 6.65C140.45 6.85 140.53 7.05 140.59 7.25L140.59 8.54"/><path fill-rule="nonzero" d="M140.59 112.77C140.48 113.16 140.38 113.54 140.25 113.92C139.48 116.14 137.43 117.61 135.06 117.62C129.17 117.63 123.28 117.62 117.39 117.62C80.46 117.62 43.53 117.62 6.60 117.62C3.28 117.62 0.85 115.20 0.91 111.97C0.97 109.05 3.37 106.76 6.47 106.67C6.63 106.66 6.79 106.67 6.95 106.67C49.48 106.67 92.00 106.66 134.53 106.67C137.76 106.67 139.69 108.17 140.46 111.28C140.48 111.35 140.55 111.41 140.59 111.48L140.59 112.77"/><path fill-rule="nonzero" d="M140.59 34.64C140.52 34.89 140.43 35.14 140.36 35.40C139.71 37.75 137.64 39.37 135.19 39.45C135.03 39.46 134.86 39.45 134.70 39.45C92.04 39.45 49.38 39.45 6.72 39.45C3.82 39.45 1.56 37.73 1.03 35.13C0.35 31.73 2.77 28.65 6.26 28.50C6.53 28.49 6.80 28.50 7.07 28.50L134.40 28.50C137.80 28.50 139.63 29.91 140.50 33.22C140.51 33.27 140.56 33.30 140.59 33.34L140.59 34.64"/><path fill-rule="nonzero" d="M140.59 86.68C140.31 87.43 140.14 88.24 139.73 88.91C138.68 90.66 137.08 91.54 135.02 91.54C124.67 91.54 114.32 91.54 103.98 91.54C71.51 91.54 39.04 91.54 6.57 91.54C3.25 91.54 0.83 89.12 0.91 85.88C0.98 83.19 3.16 80.88 5.86 80.68C6.31 80.64 6.77 80.63 7.23 80.63C49.37 80.63 91.52 80.65 133.66 80.60C137.27 80.59 139.84 81.85 140.59 85.54L140.59 86.68"/><path fill-rule="nonzero" d="M140.59 60.58C140.51 60.89 140.43 61.20 140.34 61.51C139.68 63.85 137.64 65.42 135.21 65.48C135.07 65.49 134.94 65.49 134.80 65.49C92.09 65.49 49.39 65.49 6.68 65.49C4.04 65.49 2.00 64.12 1.21 61.85C0.00 58.34 2.52 54.69 6.23 54.58C6.42 54.57 6.61 54.58 6.80 54.58C49.42 54.58 92.05 54.58 134.68 54.58C137.52 54.58 139.61 56.05 140.33 58.53C140.41 58.83 140.51 59.14 140.59 59.44L140.59 60.58"/><path fill-rule="nonzero" d="M171.05 38.04C174.08 37.87 177.05 37.77 180.00 37.50C181.43 37.37 182.39 36.36 182.92 35.04C183.26 34.19 183.58 33.29 183.71 32.39C184.53 26.48 184.51 20.54 183.92 14.63C183.50 10.44 181.76 9.02 177.56 8.98C175.78 8.97 174.00 8.98 172.22 8.98C171.84 8.98 171.45 9.03 171.05 9.06L171.05 38.04M170.99 45.02L170.99 86.08L161.16 86.08L161.16 84.75C161.16 57.41 161.17 30.07 161.14 2.73C161.14 1.59 161.41 1.21 162.61 1.23C169.04 1.31 175.48 1.09 181.89 1.42C188.34 1.75 191.16 4.44 192.66 9.31C193.23 11.14 193.63 13.08 193.74 15.00C193.96 18.87 194.12 22.76 193.96 26.62C193.86 29.22 193.34 31.83 192.72 34.36C191.93 37.59 190.00 40.01 186.31 41.29C186.75 41.46 186.90 41.53 187.05 41.57C189.65 42.26 191.24 44.08 191.88 46.54C192.62 49.38 193.35 52.28 193.49 55.19C193.87 62.93 193.92 70.69 194.15 78.45C194.23 80.98 194.46 83.50 194.62 86.09L184.92 86.09C184.77 83.68 184.53 81.31 184.49 78.95C184.40 72.07 184.44 65.20 184.33 58.33C184.29 55.59 184.15 52.83 183.75 50.13C183.27 46.88 182.43 46.04 179.20 45.58C176.55 45.20 173.84 45.20 170.99 45.02"/><path fill-rule="nonzero" d="M332.01 86.15C328.69 86.15 325.51 86.18 322.33 86.10C322.00 86.09 321.57 85.48 321.40 85.06C319.25 79.58 317.13 74.08 315.01 68.59C312.24 61.44 309.48 54.29 306.71 47.14C306.57 46.79 306.38 46.46 305.94 46.18L305.94 86.15L298.44 86.15C295.99 86.15 295.99 86.15 295.99 83.74C295.99 56.88 295.99 30.03 295.99 3.17C295.99 1.25 295.99 1.25 297.90 1.25C299.96 1.25 302.03 1.25 304.09 1.25C305.77 1.26 305.77 1.26 305.78 2.91C305.78 15.17 305.78 27.42 305.78 39.68L305.78 41.06C305.90 41.08 306.02 41.10 306.15 41.12C306.49 40.25 306.84 39.38 307.16 38.51C311.65 26.49 316.13 14.47 320.59 2.43C320.90 1.60 321.28 1.21 322.23 1.23C325.05 1.29 327.87 1.25 330.84 1.25C330.66 1.87 330.55 2.33 330.38 2.77C325.44 15.87 320.48 28.96 315.58 42.07C315.35 42.67 315.33 43.51 315.56 44.10C320.88 57.71 326.24 71.29 331.59 84.88C331.74 85.24 331.84 85.63 332.01 86.15"/><path fill-rule="nonzero" d="M216.14 61.80L229.35 61.80C227.11 46.80 224.88 31.94 222.66 17.09L222.29 17.12C220.24 31.96 218.20 46.80 216.14 61.80M203.47 86.15C204.06 82.21 204.61 78.46 205.18 74.72C206.11 68.54 207.06 62.37 208.00 56.19C209.02 49.50 210.04 42.80 211.05 36.11C211.98 29.97 212.90 23.83 213.83 17.69C214.61 12.55 215.42 7.42 216.17 2.27C216.28 1.52 216.53 1.24 217.30 1.24C220.61 1.27 223.93 1.28 227.24 1.23C228.13 1.22 228.34 1.70 228.45 2.39C229.36 7.92 230.26 13.44 231.17 18.97C232.51 27.08 233.87 35.19 235.21 43.30C236.46 50.86 237.69 58.41 238.94 65.97C239.95 72.09 240.96 78.22 241.97 84.34C242.06 84.90 242.12 85.45 242.20 86.08L233.03 86.08C232.70 83.89 232.36 81.67 232.03 79.45C231.60 76.58 231.19 73.71 230.77 70.83C230.68 70.19 230.43 69.87 229.68 69.88C225.11 69.91 220.54 69.90 215.97 69.88C215.28 69.88 214.99 70.08 214.89 70.82C214.28 75.57 213.62 80.33 212.93 85.07C212.87 85.46 212.41 86.09 212.13 86.10C209.30 86.18 206.48 86.15 203.47 86.15"/><path fill-rule="nonzero" d="M283.35 33.91L274.06 33.91C274.03 33.47 273.99 33.08 273.98 32.68C273.91 28.00 273.88 23.31 273.75 18.62C273.69 16.27 273.37 13.96 272.37 11.78C271.59 10.07 270.42 8.93 268.48 8.75C266.11 8.52 264.05 9.08 262.69 11.22C261.42 13.21 261.02 15.50 260.81 17.79C260.60 20.16 260.53 22.55 260.53 24.93C260.51 38.48 260.47 52.03 260.58 65.58C260.60 68.34 261.00 71.14 261.57 73.85C262.39 77.80 265.45 79.59 269.04 78.53C270.91 77.98 272.13 76.66 272.54 74.84C273.09 72.33 273.59 69.77 273.72 67.21C273.96 62.58 273.94 57.92 273.96 53.27C273.96 52.27 274.25 51.93 275.26 51.96C277.61 52.02 279.96 52.01 282.30 51.96C283.27 51.94 283.66 52.19 283.64 53.24C283.50 58.33 283.56 63.43 283.30 68.51C283.11 72.35 282.32 76.11 280.68 79.64C278.64 84.02 275.13 86.43 270.40 86.86C268.05 87.08 265.62 87.05 263.30 86.69C258.47 85.95 255.27 82.98 253.38 78.54C251.96 75.20 251.06 71.69 251.00 68.10C250.79 56.25 250.74 44.41 250.70 32.56C250.68 27.71 250.78 22.86 250.98 18.02C251.15 13.97 252.31 10.14 254.38 6.64C256.66 2.81 260.26 1.03 264.54 0.39C267.17 0.00 269.78 0.11 272.35 0.74C277.13 1.92 280.25 4.99 281.60 9.61C282.48 12.65 283.10 15.83 283.28 18.98C283.55 23.89 283.35 28.83 283.35 33.91"/><path fill-rule="nonzero" d="M351.40 117.96L351.40 115.95C351.40 81.05 351.40 46.15 351.40 11.25C351.40 9.34 351.39 9.34 349.48 9.34C347.34 9.34 345.19 9.31 343.05 9.35C342.21 9.37 341.92 9.07 341.95 8.23C342.00 6.29 341.99 4.34 341.95 2.40C341.93 1.60 342.13 1.24 343.01 1.24C351.59 1.26 360.16 1.26 368.73 1.24C369.59 1.24 369.87 1.58 369.85 2.40C369.82 4.34 369.82 6.28 369.85 8.22C369.87 9.06 369.54 9.36 368.71 9.35C366.61 9.31 364.50 9.38 362.40 9.32C361.38 9.29 361.00 9.68 361.10 10.66C361.14 11.06 361.11 11.47 361.11 11.87C361.11 46.57 361.11 81.27 361.11 115.97C361.11 118.36 361.21 117.93 359.08 117.95C356.58 117.98 354.08 117.96 351.40 117.96"/><path fill-rule="nonzero" d="M335.66 53.77C332.20 53.80 329.38 51.03 329.35 47.59C329.32 44.11 332.04 41.33 335.51 41.27C339.00 41.21 341.84 43.94 341.87 47.38C341.91 50.94 339.18 53.74 335.66 53.77"/><path fill-rule="nonzero" d="M230.43 95.88C231.41 95.55 231.71 96.00 231.92 96.80C233.28 101.98 234.68 107.15 236.07 112.32C236.10 112.42 236.19 112.50 236.39 112.82L236.39 95.86C236.84 95.83 237.19 95.80 237.56 95.78C237.62 95.99 237.70 96.14 237.70 96.29C237.70 103.08 237.71 109.87 237.68 116.66C237.68 116.95 237.35 117.25 237.17 117.55C236.82 117.31 236.26 117.13 236.17 116.81C234.75 111.81 233.40 106.79 232.03 101.78C231.91 101.33 231.79 100.88 231.41 100.48C231.49 101.46 231.62 102.45 231.63 103.44C231.65 107.85 231.65 112.25 231.61 116.66C231.61 116.95 231.20 117.25 230.98 117.54C230.76 117.24 230.36 116.94 230.36 116.64C230.32 109.85 230.33 103.06 230.34 96.27C230.34 96.16 230.39 96.04 230.43 95.88"/><path fill-rule="nonzero" d="M306.67 112.68C306.67 110.62 306.67 108.57 306.67 106.52C306.67 103.32 306.66 100.13 306.69 96.94C306.69 96.56 306.86 95.93 307.10 95.84C307.89 95.57 307.89 96.20 307.89 96.76C307.88 100.48 307.89 104.19 307.89 107.91C307.89 110.74 307.91 113.57 307.86 116.40C307.86 116.78 307.52 117.16 307.34 117.54C307.01 117.23 306.48 116.96 306.38 116.58C304.93 111.38 303.55 106.17 302.15 100.95C302.12 100.85 302.07 100.75 301.80 100.64C301.80 101.05 301.80 101.45 301.80 101.86C301.83 106.63 301.86 111.39 301.89 116.16C301.89 116.48 301.93 116.84 301.81 117.12C301.72 117.31 301.41 117.48 301.18 117.49C301.03 117.50 300.80 117.25 300.72 117.07C300.64 116.86 300.68 116.60 300.68 116.35C300.68 109.85 300.68 103.34 300.68 96.83C300.68 96.52 300.73 96.20 300.76 95.93C301.85 95.44 302.05 96.13 302.25 96.89C303.67 102.17 305.09 107.45 306.52 112.73C306.57 112.71 306.62 112.70 306.67 112.68"/><path fill-rule="nonzero" d="M333.98 106.17C333.83 109.10 333.81 111.81 333.53 114.48C333.29 116.64 332.06 117.74 330.32 117.81C328.69 117.88 327.70 117.32 327.09 115.80C326.73 114.87 326.45 113.87 326.34 112.89C325.87 108.30 325.64 103.70 326.68 99.15C326.87 98.35 327.22 97.52 327.69 96.85C329.07 94.90 331.71 95.01 332.94 97.06C333.35 97.74 333.57 98.52 333.94 99.39C333.41 99.66 332.96 99.89 332.42 100.16C332.25 99.63 332.22 99.09 331.95 98.76C331.49 98.21 330.89 97.45 330.32 97.43C329.74 97.40 328.79 98.05 328.60 98.60C328.09 100.15 327.63 101.80 327.62 103.41C327.58 106.68 327.82 109.94 328.03 113.20C328.08 113.90 328.36 114.67 328.78 115.21C329.12 115.65 329.88 116.07 330.38 116.00C330.94 115.92 331.81 115.32 331.87 114.86C332.16 112.71 332.24 110.53 332.30 108.36C332.31 108.19 331.68 107.90 331.32 107.82C330.73 107.69 329.94 108.03 329.98 106.94C330.02 105.84 330.84 106.22 331.41 106.18C332.16 106.13 332.92 106.17 333.98 106.17"/><path fill-rule="nonzero" d="M184.57 95.83L185.87 95.83L185.87 104.51C187.24 104.51 188.41 104.56 189.56 104.46C189.82 104.44 190.21 103.83 190.22 103.49C190.28 101.43 190.25 99.37 190.25 97.31L190.25 95.86C190.71 95.83 191.08 95.80 191.55 95.77C191.58 96.21 191.64 96.56 191.64 96.92C191.64 103.38 191.64 109.84 191.64 116.31C191.64 116.43 191.69 116.58 191.63 116.66C191.42 116.97 191.17 117.25 190.94 117.55C190.71 117.25 190.29 116.96 190.29 116.66C190.24 113.87 190.26 111.08 190.25 108.30C190.24 105.96 190.42 106.33 188.24 106.30C187.52 106.29 186.80 106.29 185.89 106.29C185.89 107.50 185.89 108.58 185.89 109.66C185.89 112.00 185.91 114.35 185.85 116.69C185.84 116.98 185.39 117.26 185.14 117.55C184.90 117.26 184.46 116.97 184.46 116.68C184.43 109.85 184.45 103.02 184.46 96.20C184.46 96.12 184.50 96.05 184.57 95.83"/><path fill-rule="nonzero" d="M256.33 95.83L257.70 95.83L257.70 105.09C257.81 105.11 257.92 105.13 258.03 105.16C258.17 104.86 258.34 104.58 258.45 104.28C259.33 101.85 260.27 99.44 261.05 96.99C261.39 95.91 261.90 95.54 263.10 95.89C262.94 96.37 262.79 96.84 262.61 97.31C261.66 99.79 260.74 102.30 259.72 104.75C259.32 105.72 259.30 106.56 259.66 107.53C260.75 110.48 261.76 113.46 262.80 116.42C262.90 116.72 262.98 117.03 263.09 117.40C262.05 117.77 261.46 117.59 261.12 116.46C260.18 113.34 259.13 110.26 258.12 107.17C258.02 107.17 257.92 107.17 257.81 107.16C257.78 107.55 257.73 107.94 257.73 108.32C257.72 110.99 257.73 113.66 257.72 116.32C257.71 116.85 257.88 117.55 256.97 117.55C256.03 117.55 256.27 116.82 256.27 116.31C256.26 109.85 256.26 103.38 256.27 96.92C256.27 96.60 256.30 96.28 256.33 95.83"/><path fill-rule="nonzero" d="M162.85 117.36L162.85 97.54C161.95 97.47 161.16 97.41 160.28 97.35L160.28 95.84L167.32 95.84C167.00 96.48 166.87 97.18 166.50 97.35C165.96 97.60 165.25 97.47 164.48 97.51C164.46 98.05 164.42 98.51 164.42 98.98C164.41 104.76 164.39 110.53 164.44 116.31C164.44 117.43 164.12 117.82 162.85 117.36"/><path fill-rule="nonzero" d="M210.28 95.85L211.69 95.85L211.69 117.40C210.89 117.60 210.18 117.88 210.19 116.56C210.21 109.81 210.20 103.07 210.21 96.32C210.21 96.20 210.24 96.08 210.28 95.85"/><path fill-rule="nonzero" d="M280.63 95.85L282.06 95.85L282.06 117.40C281.25 117.62 280.55 117.86 280.55 116.56C280.57 109.85 280.57 103.14 280.57 96.43C280.57 96.27 280.60 96.12 280.63 95.85"/></g></svg></span>
+    <div class="titulo"><small>Grupo ERT · Cámaras y afiliaciones</small><h1>Agenda de afiliaciones</h1></div>
+  </div>
+  <div class="barras" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+</header>
+
+<main class="wrap">
+  <div class="mesbar">
+    <div class="mes">
+      <button id="prev" type="button" aria-label="Mes anterior">‹</button>
+      <h2 id="titulo-mes">Octubre</h2>
+      <button id="next" type="button" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="leyenda" aria-label="Leyenda">
+      <span><b style="background:var(--alta)"></b>Prioridad alta</span>
+      <span><b style="background:var(--media)"></b>Media</span>
+      <span><b style="background:var(--baja)"></b>Baja o sin definir</span>
+      <span>✓ Confirmado (fondo azul)</span>
+    </div>
+  </div>
+  <div class="resumen" id="resumen"></div>
+  <div class="grid" id="grid"></div>
+  <div class="lista" id="lista"></div>
+  <footer>Fuente: módulo Campañas de Zoho CRM, vista «Calendario de eventos». Actualizada al 6 de noviembre de 2026.</footer>
+</main>
+
+<div class="detalle" id="detalle" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="d-nombre">
+    <button class="cerrar" id="cerrar" type="button">Cerrar</button>
+    <div class="af" id="d-af"></div>
+    <h3 id="d-nombre"></h3>
+    <div class="chips" id="d-chips"></div>
+    <dl id="d-datos"></dl>
+    <p class="liga" id="d-liga" hidden><a id="d-liga-a" href="#" target="_blank" rel="noopener">Ver evento y registro ›</a></p>
+    <div class="tema" id="d-tema"></div>
+  </div>
+</div>
+
+<script>
+const EVENTOS = [{"nombre": "Encuentro Industrial Querétaro 2026 (Industry and Supply Chain)", "afiliacion": "Externo", "tema": "El EIQ reúne a los sectores clave del ecosistema productivo regional en un solo espacio de conexión estratégica. Tres pabellones especializados para que encuentres exactamente lo que necesitas: proveedores, tecnología o socios estratégicos de negocio.\n\nHub Industrial (Manufactura · Maquinaria · Procesos) Hub Tecnológico (Automatización · Digitalización · Industria 4.0) Hub Comercial B2B (Supply Chain · Procurement · Negocios)\n\n+350 empresas expositoras - +8,000 visitantes del sector - +500 reuniones B2B - 7 sectores industriales", "modalidad": "Presencial", "inicio": "2026-09-02", "fin": "2026-09-04", "hora": "", "lugar": "QCC Querétaro Centro de Congresos", "prioridad": "Media", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Café Croissant Imagen de marca", "afiliacion": "CCIFM Francia", "tema": "NOSOTROS\nTaller \"Imagen de marca: alinear, conectar y construir comunidad\", impartido por Alfredo Pineda, seguido de un espacio de networking cercano y dinámico para intercambiar ideas, generar nuevas oportunidades de negocio y fortalecer la comunidad franco-mexicana, acompañado de café y croissants", "modalidad": "Presencial", "inicio": "2026-09-04", "fin": "2026-09-04", "hora": "09:00–10:30", "lugar": "GRUPO ERT", "prioridad": "Alta", "estado": "Asistió", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Foro Automotriz CLAUGTO", "afiliacion": "CCIFM Francia", "tema": "EL EVENTO AUTOMOTRIZ MÁS GRANDE DE AMÉRICA LATINA Durante dos días, el Foro reúne a los principales actores de la cadena de valor para generar conexiones estratégicas, oportunidades comerciales y conocimiento clave para la industria.", "modalidad": "Presencial", "inicio": "2026-09-09", "fin": "2026-09-10", "hora": "", "lugar": "Poliforum León, Guanajuato, México", "prioridad": "Media", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "B2B Virtual", "afiliacion": "AmCham", "tema": "Plataforma de vinculación directa que conecta a empresas de distintas regiones del país mediante citas virtuales de 25 minutos. Gracias a nuestra dinámica 360°, al registrarte podrás buscar y agendar reuniones con cualquier empresa del evento:\n\n-Comprador a Proveedor: Para atender requerimientos específicos de compra.\n-Proveedor a Comprador: Para presentar propuestas comerciales directas.\n-Entre Compradores / Entre Proveedores: Para desarrollar alianzas y sinergias", "modalidad": "En línea", "inicio": "2026-09-09", "fin": "2026-09-10", "hora": "09:00–16:30", "lugar": "NA", "prioridad": "Alta", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Extend Our Reach", "afiliacion": "AmCham", "tema": "Encuentro que impulsa la colaboración estratégica entre México y Estados Unidos, fortaleciendo el diálogo y la generación de oportunidades en uno de los polos de desarrollo más importantes de México.\n\nReuniendo a líderes empresariales, representantes de la Embajada de Estados Unidos y actores clave del desarrollo económico para intercambiar perspectivas, generar alianzas y promover nuevas oportunidades de inversión, innovación y crecimiento entre las empresas de AmCham con 3 actividades dentro del programa:\n\n1. Recorrido Planta Mars cereales\nCupo limitado 20 ejecutivos\n\n2. Comida de Networking en Hacienda Los Laureles\n2:00 p.m. - 3:00 p.m.\nCosto por persona | $1,100 + servicio\n\n3. Conferencia & cocktail en Hacienda Jofre\nRegistro: 5:00 p.m.\nSesión y cocktail: 5:30 p.m. - 8:30 p.m.", "modalidad": "Presencial", "inicio": "2026-09-23", "fin": "2026-09-23", "hora": "08:00–17:00", "lugar": "Planta Mars cereales: Carr. Al Campo Militar Kilómetro 1, San Antonio de la Punta, 76000, Santiago de Querétaro, Qro.\n\nComida de Networking en Hacienda Los Laureles: 5 Carretera México-San Luis Potosí, Km. 8 5, Jurica, 76100, Santiago de Querétaro, Qro.\n\nConferencia & cocktail en Hacienda Jofre: Camino a Jofre s/n, 76215 Jofre, Qro.", "prioridad": "Alta", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Afterwork Garrigues T-MEC", "afiliacion": "CCIFM Francia", "tema": "Comercio Exterior: Retos y oportunidades en tiempos de cambio", "modalidad": "Presencial", "inicio": "2026-09-24", "fin": "2026-09-24", "hora": "", "lugar": "Qro", "prioridad": "", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Visita a planta METALOR", "afiliacion": "CCIFM Francia", "tema": "Metalor Technologies, una de las empresas más respetadas en la industria mundial de metales preciosos y que forma parte de TANAKA.", "modalidad": "Presencial", "inicio": "2026-09-24", "fin": "2026-09-24", "hora": "", "lugar": "SLP", "prioridad": "Media", "estado": "No asistiremos", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Desayuno agremiados", "afiliacion": "Amigos Materialistas", "tema": "En esta reunión estaremos viendo y tomando acuerdos sobre los siguientes temas:\n\n-Presentación de la Aplicación de Amigos Materialistas, sus funciones y avances.\n\n- Asesoría jurídica, con la presencia de un abogado para revisar el manejo de la información relacionada con clientes y empleados dentro de la aplicación.\n\n- Presentación de la propuesta del Foro Legislativo, enfocada en la protección y certeza para los proveedores dentro de la cadena de suministro de la construcción y el pago oportuno.\n\n- Informe financiero de la Asociación.\n\n- Actividades de fin de año.\n\n- Anualidades y renovación.", "modalidad": "Presencial", "inicio": "2026-10-01", "fin": "2026-10-01", "hora": "08:30–10:30", "lugar": "Hotel Holiday Inn 5 de febrero\nSalón Ópalo", "prioridad": "Alta", "estado": "Asistió", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Café Croissant Comunicación efectiva", "afiliacion": "CCIFM Francia", "tema": "Taller \"Comunicación Efectiva\", impartido por Joseline Aguilar, seguido de un espacio de networking cercano y dinámico para intercambiar ideas, generar nuevas oportunidades de negocio y fortalecer la comunidad franco-mexicana, acompañado de café y croissants", "modalidad": "Presencial", "inicio": "2026-10-02", "fin": "2026-10-02", "hora": "09:00–10:30", "lugar": "We Advise\nBlvd. Bernardo Quintana 300, Int. 408, Centro Sur, Santiago de Querétaro 7609, Querétaro", "prioridad": "Media", "estado": "Asistió", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Expo Potosí Industrial", "afiliacion": "CCIFM Francia", "tema": "EXPO POTOSÍ INDUSTRIAL 2026 Reúne a Líderes Empresariales, Autoridades, Organismos Internacionales, Desarrolladores, Instituciones Financieras, Expertos en Logística, Manufactura Avanzada, Energía, Automatización, Innovación y Comercio Exterior para Abordar las Decisiones que Definirán la Competitividad Industrial de Norteamérica Durante los Próximos Años.", "modalidad": "Presencial", "inicio": "2026-10-08", "fin": "2026-10-09", "hora": "", "lugar": "Centro de Negocios Potosí\nBlvd. Antonio Rocha Cordero #125 Desarrollo del Pedregal\nSan Luis Potosí, S.L.P., México", "prioridad": "Media", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Afterwork Europeo Conferencia entorno geopolítico", "afiliacion": "CCIFM Francia", "tema": "Cóctel Europeo\nGeopolítica y Negocios: El Nuevo Orden Mundial \nImpartido por Dr. Mauricio Meschoulam Experto en Geopolítica y Seguridad Internacional", "modalidad": "Presencial", "inicio": "2026-10-22", "fin": "2026-10-22", "hora": "18:30–21:30", "lugar": "BLOQUE\nCentro de Innovación y Tecnología Creativa", "prioridad": "Baja", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "RDV Empresarial Morelia", "afiliacion": "CCIFM Francia", "tema": "Encuentro Industrial\n7:00 - Salida desde oficinas InvestMx, Qro\n9:30 - Llegada ElevaPark Morelia\n10:00 - Visita a empresa Mercado Libre\n11:00 - Visita a empresa Andritz\n12:15 - Visita a empresa Corporativo Cinepolis\n14:00 - Comida\n16:00 - Cierre de evento y regreso a Qro\n\nLlevar equipo de seguridad y ropa cómoda", "modalidad": "Presencial", "inicio": "2026-10-28", "fin": "2026-10-28", "hora": "07:00–19:30", "lugar": "Morelia", "prioridad": "Alta", "estado": "Asistió", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Café Croissant · Diferencias culturales Francia-México", "afiliacion": "CCIFM Francia", "tema": "Una mañana llena de deliciosos croissants, acompañada de un taller sobre las diferencias culturales entre Francia y México para hacer negocios. Exclusivo socios.", "modalidad": "Presencial", "inicio": "2026-11-06", "fin": "2026-11-06", "hora": "09:00–10:30", "lugar": "Oficinas Cla Global, Querétaro", "prioridad": "", "estado": "Asistió", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Sesión: Liderazgo con IA: Transformando la Cultura y Evolucionando el Talento", "afiliacion": "AmCham", "tema": "Sesión del comité de Capital Humano. Reflexión sobre el papel del liderazgo en la adopción estratégica de la inteligencia artificial y la automatización como impulsores de la transformación organizacional: cómo las decisiones de los líderes moldean la cultura, impulsan nuevas capacidades y aseguran la adaptación del talento. Estrategias para equilibrar la adopción tecnológica con el factor humano.", "modalidad": "Presencial", "inicio": "2026-11-10", "fin": "2026-11-10", "hora": "08:30–10:00", "lugar": "AmCham Capítulo Guadalajara", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/sesion-liderazgo-con-ia-transformando-la-cultura-y-evolucionando-el-talento/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Sesión: Data Centers y la Demanda Energética", "afiliacion": "AmCham", "tema": "Sesión conjunta del Task Force de Energía Noroeste y el Comité de Innovación y TICs de CDMX: cómo el crecimiento de semiconductores, inteligencia artificial y centros de datos transforma la demanda energética, y las oportunidades para la manufactura avanzada, la infraestructura eléctrica y la atracción de inversiones.", "modalidad": "En línea", "inicio": "2026-11-10", "fin": "2026-11-10", "hora": "09:00–10:30", "lugar": "Virtual (AmCham CDMX y Noroeste)", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/sesion-data-centers-y-la-demanda-energetica/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Expo Automotive Connection Potosí 2026", "afiliacion": "CCIFM Francia", "tema": "Encuentro de la industria automotriz que reúne a compradores, proveedores y empresas del sector para generar nuevas oportunidades de negocio, fortalecer cadenas de suministro y crear conexiones estratégicas. Dos días de conexiones, proveeduría y oportunidades de negocio.", "modalidad": "Presencial", "inicio": "2026-11-11", "fin": "2026-11-12", "hora": "", "lugar": "Centro de Negocios, San Luis Potosí", "prioridad": "", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Pacto por la Igualdad Salarial · Toolkit de mejores prácticas", "afiliacion": "AmCham", "tema": "Foro de seguimiento del Pacto por la Igualdad Salarial de AmCham, firmado hace dos años por más de 80 empresas: evaluar avances, compartir aprendizajes y renovar el compromiso con centros de trabajo inclusivos y compensación equitativa.", "modalidad": "Presencial", "inicio": "2026-11-11", "fin": "2026-11-11", "hora": "08:30–11:00", "lugar": "AmCham Ciudad de México", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/pacto-por-la-igualdad-salarial-colaboracion-para-toolkit-mejores-practicas/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Foro de Salud EUROCAM 2026", "afiliacion": "AmCham", "tema": "Segunda edición del Foro de Salud de EUROCAM y AmCham, con enfoque en sostenibilidad: reúne a las empresas más destacadas del ecosistema de salud en México en torno a tres ejes estratégicos del sector.", "modalidad": "Presencial", "inicio": "2026-11-12", "fin": "2026-11-12", "hora": "08:00–13:00", "lugar": "AmCham Ciudad de México", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/foro-de-salud-eurocam-2026/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Sesión: Ferrocarriles de Carga: La Columna Vertebral de Norteamérica", "afiliacion": "AmCham", "tema": "Industria, autoridades, empresas usuarias y operadores ferroviarios analizan el papel del ferrocarril en la competitividad de México y la integración de las cadenas de suministro de Norteamérica. Tres paneles: el momento del sector, las necesidades logísticas de industrias como la automotriz, agroindustrial, energética y de bienes de consumo, y las inversiones e interoperabilidad necesarias.", "modalidad": "Presencial", "inicio": "2026-11-12", "fin": "2026-11-12", "hora": "08:30–12:00", "lugar": "AmCham Ciudad de México", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/sesion-ferrocarriles-de-carga-la-columna-vertebral-de-norteamerica/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Sesión: Inclusión financiera y acceso efectivo", "afiliacion": "AmCham", "tema": "Comité de Servicios Financieros: conversación con líderes fintech (Stori Card, Mercado Pago, MetLife Xcelerator, DGA Group) sobre cómo acelerar la adopción de soluciones financieras digitales y pasar de la disponibilidad tecnológica al uso.", "modalidad": "Presencial", "inicio": "2026-11-12", "fin": "2026-11-12", "hora": "10:00–11:30", "lugar": "AmCham Ciudad de México", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/sesion-inclusion-financiera-y-acceso-efectivo-como-pasar-de-la-disponibilidad-digital-al-uso/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Extend Our Reach · Doing business in Edinburg", "afiliacion": "AmCham", "tema": "Misión ejecutiva en Edinburg, Texas, para líderes empresariales que buscan expandirse en Estados Unidos: sesiones con directivos de la FDA y la CBP sobre exportación, incentivos e infraestructura de Edinburg y su EDC para el escalamiento industrial en el Valle de Texas, y networking con autoridades y empresarios de la región. Espacios limitados.", "modalidad": "Presencial", "inicio": "2026-11-17", "fin": "2026-11-17", "hora": "", "lugar": "Edinburg, Texas, EUA (AmCham Capítulo Noreste)", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/extend-our-reach-doing-business-in-edinburgh/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Sesión: Agenda laboral 2026–2027", "afiliacion": "AmCham", "tema": "Prioridades legislativas laborales 2026–2027 y lo que podrían significar para las empresas; diálogo para impulsar el empleo formal, la productividad y el bienestar laboral.", "modalidad": "Presencial", "inicio": "2026-11-17", "fin": "2026-11-17", "hora": "08:00–09:30", "lugar": "AmCham Ciudad de México", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/sesion-agenda-laboral-2026-2027-prioridades-legislativas-y-dialogo-con-el-sector-empresarial/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Open House GDL", "afiliacion": "AmCham", "tema": "Networking del Capítulo Guadalajara. Programa sujeto a cambios; lugar por confirmar.", "modalidad": "Presencial", "inicio": "2026-11-19", "fin": "2026-11-19", "hora": "18:00–21:00", "lugar": "AmCham Capítulo Guadalajara (lugar por confirmar)", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/open-house-gdl-2/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Cena Gala AmCham", "afiliacion": "AmCham", "tema": "Cena de cierre de año de AmCham: celebrar lo logrado, conectar con la comunidad e intercambiar ideas para comenzar 2027. Evento exclusivo para socios.", "modalidad": "Presencial", "inicio": "2026-11-19", "fin": "2026-11-19", "hora": "19:00–23:30", "lugar": "The Westin Santa Fe, Ballroom\nAv. Javier Barros Sierra 540, Santa Fe, Álvaro Obregón, 01219, CDMX", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/evento-de-cierre-de-ano-2/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Foro · 11.° Sondeo de Seguridad Empresarial", "afiliacion": "AmCham", "tema": "Resultados de la 11.ª edición del Sondeo de Seguridad Empresarial de AmCham: cómo la seguridad impacta la operación, la inversión y la competitividad de las empresas en México, y las tendencias que marcan la agenda de seguridad empresarial.", "modalidad": "Presencial", "inicio": "2026-11-23", "fin": "2026-11-23", "hora": "08:00–10:30", "lugar": "Sheraton María Isabel, Salón Bugambilias\nAv. Paseo de la Reforma 325, Cuauhtémoc, 06500, CDMX", "prioridad": "", "estado": "Por confirmar", "liga": "https://amcham.org.mx/evento/foro-seguridad/", "precio": "", "marcas": [], "asisten": []}, {"nombre": "Cena Bicentenario · 200 años de relación México-Francia", "afiliacion": "CCIFM Francia", "tema": "Cena formal con temática de «Bicentenario: 200 años de relación México Francia». Encuentro para cerrar el año.", "modalidad": "Presencial", "inicio": "2026-12-03", "fin": "2026-12-03", "hora": "18:00–22:30", "lugar": "Hacienda Jurica, Querétaro", "prioridad": "", "estado": "Por confirmar", "liga": "", "precio": "", "marcas": [], "asisten": []}];
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const DIAS = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+const hoy = new Date();
+let anio = 2026, mes = 9;
+if (hoy.getFullYear() === 2026 && hoy.getMonth() >= 8 && hoy.getMonth() <= 11) mes = hoy.getMonth();
+const iso = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const enDia = (e, s) => e.inicio <= s && s <= e.fin;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function chip(e, i) {
+  const conf = e.estado === "Confirmado";
+  const quien = e.afiliacion;
+  return `<button class="ev ${esc(e.prioridad || "Baja")} ${conf ? "conf" : ""}" data-i="${i}" type="button">
+    <span class="n">${esc(e.nombre)}</span><span class="a">${esc(e.hora ? e.hora + " · " : "")}${esc(quien)}</span></button>`;
+}
+
+function pintar() {
+  document.getElementById("titulo-mes").textContent = MESES[mes];
+  const primero = new Date(anio, mes, 1);
+  const ini = new Date(primero); ini.setDate(1 - ((primero.getDay() + 6) % 7));
+  let g = DIAS.map(d => `<div class="dow">${d}</div>`).join("");
+  for (let k = 0; k < 42; k++) {
+    const d = new Date(ini); d.setDate(ini.getDate() + k);
+    if (k >= 35 && d.getMonth() !== mes) break;
+    const s = iso(d);
+    const evs = EVENTOS.map((e, i) => [e, i]).filter(([e]) => enDia(e, s));
+    g += `<div class="dia ${d.getMonth() !== mes ? "fuera" : ""} ${s === iso(hoy) ? "hoy" : ""}">
+      <span class="num">${d.getDate()}</span>${evs.map(([e, i]) => chip(e, i)).join("")}</div>`;
+  }
+  const delMes = EVENTOS.map((e, i) => [e, i]).filter(([e]) => {
+    const a = `${anio}-${String(mes+1).padStart(2,"0")}`;
+    return e.inicio.slice(0,7) <= a && a <= e.fin.slice(0,7);
+  });
+  if (!delMes.length) g += `<div class="vacio">Aún no hay eventos capturados para ${MESES[mes].toLowerCase()}. Se agregan en Zoho CRM › Campañas.</div>`;
+  document.getElementById("grid").innerHTML = g;
+
+  document.getElementById("lista").innerHTML = delMes.length ? delMes.map(([e, i]) => {
+    const d = new Date(e.inicio + "T12:00");
+    return `<div class="item"><div class="fecha">${d.getDate()}<small>${DIAS[(d.getDay()+6)%7]}</small></div>${chip(e, i)}</div>`;
+  }).join("") : `<div class="vacio">Aún no hay eventos capturados para ${MESES[mes].toLowerCase()}.</div>`;
+
+  const conf = delMes.filter(([e]) => e.estado === "Confirmado").length;
+  const alta = delMes.filter(([e]) => e.prioridad === "Alta").length;
+  document.getElementById("resumen").innerHTML =
+    `<span><strong>${delMes.length}</strong> eventos</span><span><strong>${conf}</strong> confirmados</span><span><strong>${delMes.length - conf}</strong> por decidir</span><span><strong>${alta}</strong> de prioridad alta</span>`;
+}
+
+function fechaLarga(e) {
+  const f = s => { const d = new Date(s + "T12:00"); return `${d.getDate()} de ${MESES[d.getMonth()].toLowerCase()}`; };
+  return (e.inicio === e.fin ? f(e.inicio) : `${f(e.inicio)} al ${f(e.fin)}`) + (e.hora ? `\n${e.hora} h` : "\nHorario por confirmar");
+}
+
+function abrir(i) {
+  const e = EVENTOS[i];
+  document.getElementById("d-af").textContent = e.afiliacion;
+  document.getElementById("d-nombre").textContent = e.nombre;
+  document.getElementById("d-chips").innerHTML =
+    `<span class="chip ${e.estado === "Confirmado" ? "conf" : ""}">${esc(e.estado)}</span>` +
+    (e.prioridad ? `<span class="chip p-${esc(e.prioridad)}">Prioridad ${esc(e.prioridad.toLowerCase())}</span>` : "") +
+    (e.modalidad ? `<span class="chip">${esc(e.modalidad)}</span>` : "");
+  const filas = [["Fecha", fechaLarga(e)], ["Lugar", e.lugar]];
+  document.getElementById("d-datos").innerHTML = filas.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v || "Por definir")}</dd>`).join("");
+  const lg = document.getElementById("d-liga"); lg.hidden = !e.liga;
+  if (e.liga) document.getElementById("d-liga-a").href = e.liga;
+  document.getElementById("d-tema").textContent = e.tema;
+  document.getElementById("detalle").hidden = false;
+  document.getElementById("cerrar").focus();
+}
+const cerrar = () => document.getElementById("detalle").hidden = true;
+
+document.addEventListener("click", ev => {
+  const b = ev.target.closest(".ev"); if (b) abrir(+b.dataset.i);
+  if (ev.target.id === "detalle" || ev.target.id === "cerrar") cerrar();
+});
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") cerrar(); });
+document.getElementById("prev").onclick = () => { if (mes > 0) { mes--; pintar(); } };
+document.getElementById("next").onclick = () => { if (mes < 11) { mes++; pintar(); } };
+pintar();
+</script>
